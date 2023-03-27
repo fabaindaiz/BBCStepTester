@@ -128,15 +128,29 @@ let nasm basefile =
   wrap_result @@ CCUnix.call "nasm -f %s -o %s.o %s.s" bin_format basefile basefile
 
 
+let read_whole_file filename =
+  let ch = open_in filename in
+  let s = really_input_string ch (in_channel_length ch) in
+  close_in ch;
+  s
 
 
-type compiler = string -> out_channel -> unit
+type runtime =
+| CRuntime of string
+| CompileOut
+
+type compiler =
+| Compiler of (string -> out_channel -> unit)
+
+type oracle =
+| Interp of (string -> status * string)
+| Expected
 
 let make_test
     ~compile_flags
-    runtime
+    (runtime:runtime)
     ~(compiler:compiler)
-    ~oracle
+    ~(oracle:oracle)
     filename =
   match read_test filename with
   | None -> Alcotest.failf "Could not open or parse test %s" filename
@@ -147,15 +161,22 @@ let make_test
 
       let res =
         let* () =
-          try Ok (CCIO.with_out (base ^ ".s") (compiler test.src))
-          with e -> Error (CTError, Printexc.to_string e)
+          match compiler with
+          | Compiler compiler ->
+            try Ok (CCIO.with_out (base ^ ".s") (compiler test.src))
+            with e -> Error (CTError, Printexc.to_string e)
         in
-        let* () = nasm base in
-        let* () = clang ~compile_flags runtime base in
-        let out, err, retcode = CCUnix.call ~env:(Array.of_list test.params) "./%s" exe in
-        if retcode = 0 then
+        match runtime with
+        | CRuntime runtime ->
+          let* () = nasm base in
+          let* () = clang ~compile_flags runtime base in
+          let out, err, retcode = CCUnix.call ~env:(Array.of_list test.params) "./%s" exe in
+          if retcode = 0 then
+            Ok (process_output out)
+          else Error (RTError, out ^ err)
+        | CompileOut ->
+          let out = (read_whole_file (base ^ ".s")) in
           Ok (process_output out)
-        else Error (RTError, out ^ err)
       in
 
       let res = match res with
@@ -164,11 +185,11 @@ let make_test
       in
 
       let expected =
-        let i_oracle = CCString.find ~sub:"|ORACLE" test.expected in
+        let i_interp = CCString.find ~sub:"|INTERP" test.expected in
         match oracle with
-        | Some interp when test.status = NoError && i_oracle <> -1 ->
-          let prefix = CCString.sub test.expected 0 (max (i_oracle - 1) 0) in
-          let status , output = interp test.src in
+        | Interp oracle when test.status = NoError && i_interp <> -1 ->
+          let prefix = CCString.sub test.expected 0 (max (i_interp - 1) 0) in
+          let status , output = oracle test.src in
           status , prefix ^ output
         | _ -> test.status, test.expected
       in
@@ -187,7 +208,7 @@ let name_from_file filename =
   let open Filename in
   dirname filename ^ "::" ^ basename (chop_extension filename)
 
-let tests_from_dir ?(compile_flags="-g") ~runtime ~compiler ?oracle dir =
+let tests_from_dir ?(compile_flags="-g") ~runtime ~compiler ~oracle dir =
   let open Alcotest in
   let to_test testfile =
     let testname, exec_test = make_test ~compile_flags runtime ~compiler ~oracle testfile in

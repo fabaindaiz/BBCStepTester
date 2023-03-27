@@ -1,4 +1,4 @@
 (library
- (name bbctester) ; Black-Box Compiler Tester
- (public_name bbctester)
+ (name bbcsteptester) ; Black-Box Compiler Tester
+ (public_name bbcsteptester)
  (libraries str alcotest containers containers.unix))

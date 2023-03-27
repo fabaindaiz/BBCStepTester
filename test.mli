@@ -50,9 +50,20 @@ type t =
  *)
 val read_test : string -> t option
 
+val read_whole_file : string -> string
+
+type runtime =
+  | CRuntime of string
+  | CompileOut
+
 (** A compiler is a function that takes a source program as a string, and 
     an output channel as a sink to output the compiled program  *)
-type compiler = string -> out_channel -> unit
+type compiler =
+  | Compiler of (string -> out_channel -> unit)
+
+type oracle =
+  | Interp of (string -> status * string)
+  | Expected
 
 (** [testfiles_in_dir path] collects the content of all thet `*.bbc` files
     found at [path]; uses `find` (GNU findutils) *)
@@ -67,9 +78,9 @@ val testfiles_in_dir : string -> string list
     The optional [oracle] parameter is an oracle (eg. an interpreter, reference compiler) to be invoked on source files.
     It should return a result status together with the expected output of the corresponding program,
     that will be substituted in the first mention of `|ORACLE` in a test file, if any. *)
-val tests_from_dir :
+ val tests_from_dir :
   ?compile_flags:string ->
-  runtime:string ->
+  runtime:runtime ->
   compiler:compiler ->
-  ?oracle:(string -> status * string) ->
+  oracle:oracle ->
   string -> (string * unit Alcotest.test_case list) list
