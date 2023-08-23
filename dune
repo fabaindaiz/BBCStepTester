@@ -1,4 +1,5 @@
 (library
  (name bbcsteptester) ; Black-Box Compiler Tester
  (public_name bbcsteptester)
+ (modules type runtime test util)
  (libraries str alcotest containers containers.unix))

@@ -1,4 +1,4 @@
-(lang dune 2.9)
+(lang dune 3.10)
 
 
 (name bbcsteptester)
@@ -11,7 +11,7 @@
 
 (package
   (name bbcsteptester)
-  (version 0.1)
+  (version 0.2)
   (synopsis "Black-box compiler tester")
   (description "Tester for the compilation lecture CC5116")
   (depends
