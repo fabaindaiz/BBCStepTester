@@ -51,12 +51,12 @@ let make_test
       let res =
         let* () =
           match compiler with
-          | CCompiler compiler ->
+          | Compiler compiler ->
             try Ok (CCIO.with_out (base ^ ".s") (compiler test.src))
             with e -> Error (CTError, Printexc.to_string e)
         in
         match runtime with
-        | CRuntime runtime -> (runtime test filename)
+        | Runtime runtime -> (runtime test filename)
       in
 
       let res = match res with

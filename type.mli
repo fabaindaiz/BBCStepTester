@@ -40,12 +40,12 @@ type t =
 
 
 type runtime =
-| CRuntime of (t -> string -> (string, status * string) result)
+| Runtime of (t -> string -> (string, status * string) result)
 
 (** A compiler is a function that takes a source program as a string, and 
   an output channel as a sink to output the compiled program  *)
 type compiler =
-| CCompiler of (string -> out_channel -> unit)
+| Compiler of (string -> out_channel -> unit)
 
 type oracle =
 | Interp of (string -> status * string)

@@ -46,24 +46,26 @@ let cruntime
   else Error (RTError, out ^ err)
 
 
-let compileout =
-    fun
-    (_ : t)
-    (filename : string) ->
-  let base = Filename.chop_extension filename in
-
-  let out = CCIO.(with_in (base ^ ".s") read_all) in
-  Ok (process_output out)
-
-
 let unixcommand
     (command : string -> string * string * int) =
     fun
     (_ : t)
     (filename : string) ->
   let base = Filename.chop_extension filename in
+  let file = base ^ ".s" in
 
-  let out, err, retcode = command (base ^ ".s") in
+  let out, err, retcode = command file in
   if retcode = 0 then
     Ok (process_output out)
   else Error (RTError, out ^ err)
+
+
+let compileout =
+    fun
+    (_ : t)
+    (filename : string) ->
+  let base = Filename.chop_extension filename in
+  let file = base ^ ".s" in
+
+  let out = CCIO.(with_in file read_all) in
+  Ok (process_output out)
