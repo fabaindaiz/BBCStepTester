@@ -29,8 +29,9 @@ val testfiles_in_dir : string -> string list
     It should return a result status together with the expected output of the corresponding program,
     that will be substituted in the first mention of `|ORACLE` in a test file, if any. *)
 val tests_from_dir :
+  name:string ->
   compiler:compiler ->
   oracle:oracle ->
   runtime:runtime ->
-  action : action ->
+  action:action ->
   string -> (string * unit Alcotest.test_case list) list

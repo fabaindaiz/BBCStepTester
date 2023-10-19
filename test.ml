@@ -96,11 +96,11 @@ let name_from_file filename =
   dirname filename ^ "::" ^ basename (chop_extension filename)
 
 
-let tests_from_dir ~compiler ~oracle ~runtime ~action dir =
+let tests_from_dir ~name ~compiler ~oracle ~runtime ~action dir =
   let open Alcotest in
   let to_test testfile =
-    let testname, exec_test = make_test ~compiler ~oracle ~runtime testfile ~action in
-    name_from_file testfile, [test_case testname `Quick exec_test]
+    let testname, exec_test = make_test ~compiler ~oracle ~runtime ~action testfile in
+    name_from_file (name ^ "::" ^ testfile), [test_case testname `Quick exec_test]
   in
   List.map to_test @@ testfiles_in_dir dir
   |> CCList.sort (fun (s1,_) (s2,_) -> String.compare s1 s2)
