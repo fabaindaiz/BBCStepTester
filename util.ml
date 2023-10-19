@@ -22,6 +22,12 @@ let string_match =
   in
   testable (pp string) matches
 
+let status_match =
+  let open Alcotest in
+  let matches _ _ = true in
+  testable (pp string) matches
+
+
 let status =
   let open Alcotest in
   testable Fmt.(using string_of_status string) (=)
@@ -34,6 +40,7 @@ let dep_pair : type a b. a Alcotest.testable -> (a -> b Alcotest.testable) -> (a
   let cmp_pair (x1, x2) (y1, y2) = equal cmp1 x1 y1 && equal (cmp2 x1) x2 y2 in
   testable (fun fmt p -> pp (pair cmp1 (cmp2 (fst p))) fmt p) cmp_pair
 
+
 (* Testing the result of running a test *)
 let compare_results =
   let cmp_res = function
@@ -41,3 +48,9 @@ let compare_results =
     | _ -> string_match
   in
   dep_pair status cmp_res
+
+let execute_results =
+  let exe_res = function
+    | _ -> status_match
+in
+  dep_pair status exe_res

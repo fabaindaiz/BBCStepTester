@@ -50,3 +50,7 @@ type compiler =
 type oracle =
 | Interp of (string -> status * string)
 | Expected
+
+type action =
+| Compare
+| Execute

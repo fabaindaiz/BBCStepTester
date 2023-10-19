@@ -30,7 +30,7 @@ type t =
 
 
 type runtime =
-|  Runtime of (t -> string -> (string, status * string) result)
+| Runtime of (t -> string -> (string, status * string) result)
 
 type compiler =
 | Compiler of (string -> out_channel -> unit)
@@ -38,3 +38,7 @@ type compiler =
 type oracle =
 | Interp of (string -> status * string)
 | Expected
+
+type action =
+| Compare
+| Execute

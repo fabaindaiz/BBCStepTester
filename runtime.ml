@@ -10,6 +10,7 @@ let wrap_result (out, err, retcode) =
   then (print_string out ; Ok ())
   else Error (CTError, out ^ err)
 
+
 (* Find out current architecture (only supporting Linux/OS X for now) *)
 let bin_format =
   let out, _ , _ = CCUnix.call "uname -s" in
@@ -19,11 +20,12 @@ let bin_format =
   | "Darwin" -> "macho64"
   | _ -> Fmt.failwith "Unknown architecture %s" arch
 
-let clang ~compile_flags runtime basefile =
-  wrap_result @@ CCUnix.call "clang %s -o %s.run %s %s.o" compile_flags basefile runtime basefile
 
 let nasm basefile =
   wrap_result @@ CCUnix.call "nasm -f %s -o %s.o %s.s" bin_format basefile basefile
+
+let clang ~compile_flags runtime basefile =
+  wrap_result @@ CCUnix.call "clang %s -o %s.run %s %s.o" compile_flags basefile runtime basefile
 
 
 let (let*) = Result.bind

@@ -41,6 +41,7 @@ let make_test
     ~(compiler : compiler)
     ~(oracle : oracle)
     ~(runtime : runtime)
+    ~(action : action)
     (filename : string) =
   match read_test filename with
   | None -> Alcotest.failf "Could not open or parse test %s" filename
@@ -59,7 +60,8 @@ let make_test
         | Runtime runtime -> (runtime test filename)
       in
 
-      let res = match res with
+      let res = 
+        match res with
         | Ok out -> NoError, out
         | Error err -> err
       in
@@ -74,8 +76,14 @@ let make_test
         | _ -> test.status, test.expected
       in
 
+      let check_fun =
+        match action with
+        | Compare -> compare_results
+        | Execute -> execute_results
+      in
+
       let open Alcotest in
-      check compare_results test.name expected res
+      check check_fun test.name expected res
 
     in test.name, exec
 
@@ -87,10 +95,11 @@ let name_from_file filename =
   let open Filename in
   dirname filename ^ "::" ^ basename (chop_extension filename)
 
-let tests_from_dir ~compiler ~oracle ~runtime dir =
+
+let tests_from_dir ~compiler ~oracle ~runtime ~action dir =
   let open Alcotest in
   let to_test testfile =
-    let testname, exec_test = make_test ~compiler ~oracle ~runtime testfile in
+    let testname, exec_test = make_test ~compiler ~oracle ~runtime testfile ~action in
     name_from_file testfile, [test_case testname `Quick exec_test]
   in
   List.map to_test @@ testfiles_in_dir dir
