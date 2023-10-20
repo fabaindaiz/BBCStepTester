@@ -34,40 +34,46 @@ let (let*) = Result.bind
 let cruntime
     ?(compile_flags: string ="-g")
     (runtime : string) =
-    fun
-    (test : t)
-    (filename : string) ->
-  let base = Filename.chop_extension filename in
-  let exe = base ^ ".run" in
-  
-  let* () = nasm base in
-  let* () = clang ~compile_flags runtime base in
-  let out, err, retcode = CCUnix.call ~env:(Array.of_list test.params) "./%s" exe in
-  if retcode = 0 then
-    Ok (process_output out)
-  else Error (RTError, out ^ err)
+    Runtime (
+        fun
+        (test : t)
+        (filename : string) ->
+      let base = Filename.chop_extension filename in
+      let exe = base ^ ".run" in
+      
+      let* () = nasm base in
+      let* () = clang ~compile_flags runtime base in
+      let out, err, retcode = CCUnix.call ~env:(Array.of_list test.params) "./%s" exe in
+      if retcode = 0 then
+        Ok (process_output out)
+      else Error (RTError, out ^ err)
+    )
 
 
 let unixcommand
     (command : string -> string * string * int) =
-    fun
-    (_ : t)
-    (filename : string) ->
-  let base = Filename.chop_extension filename in
-  let file = base ^ ".s" in
+    Runtime (
+        fun
+        (_ : t)
+        (filename : string) ->
+      let base = Filename.chop_extension filename in
+      let file = base ^ ".s" in
 
-  let out, err, retcode = command file in
-  if retcode = 0 then
-    Ok (process_output out)
-  else Error (RTError, out ^ err)
+      let out, err, retcode = command file in
+      if retcode = 0 then
+        Ok (process_output out)
+      else Error (RTError, out ^ err)
+    )
 
 
 let compileout =
-    fun
-    (_ : t)
-    (filename : string) ->
-  let base = Filename.chop_extension filename in
-  let file = base ^ ".s" in
+    Runtime (
+        fun
+        (_ : t)
+        (filename : string) ->
+      let base = Filename.chop_extension filename in
+      let file = base ^ ".s" in
 
-  let out = CCIO.(with_in file read_all) in
-  Ok (process_output out)
+      let out = CCIO.(with_in file read_all) in
+      Ok (process_output out)
+    )

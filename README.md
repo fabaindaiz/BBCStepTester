@@ -90,13 +90,12 @@ open Bbcsteptester.Runtime
 (* .......... *)
 
 let () =
-  let compile_flags = Option.value (Sys.getenv_opt "CFLAGS") ~default:"-g" in
 
   let compiler : compiler = 
     Compiler (fun s o -> fprintf o "%s" (compile_prog (parse_prog (sexp_from_string s))) ) in
 
-  let runtime : runtime =
-    Runtime (cruntime ~compile_flags "rt/sys.c") in
+  let compile_flags = Option.value (Sys.getenv_opt "CFLAGS") ~default:"-g" in
+  let runtime : runtime = (cruntime ~compile_flags "rt/sys.c") in
   
   let oracle : oracle = 
     Interp (
