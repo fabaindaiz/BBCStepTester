@@ -36,9 +36,9 @@ type runtime =
 | Runtime of (t -> string -> (string, status * string) result)
 
 type oracle =
-| Interp of (string -> status * string)
+| Interpreter of (string -> status * string)
 | Expected
 
 type action =
-| Compare
-| Execute
+| CompareOutput
+| IgnoreOutput

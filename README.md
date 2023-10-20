@@ -98,7 +98,7 @@ let () =
   let runtime : runtime = (cruntime ~compile_flags "rt/sys.c") in
   
   let oracle : oracle = 
-    Interp (
+    Interpreter (
       fun s -> (
         try
           NoError, string_of_val (interp_prog (parse_prog (sexp_from_string s)) empty_env)
@@ -112,7 +112,7 @@ let () =
   
   let bbc_tests =
     let name : string = "bbc" in
-    let action : action = Compare in
+    let action : action = CompareOutput in
     tests_from_dir ~name ~compiler ~runtime ~oracle ~action "bbctests" in
   
   run "Tests MiniCompiler" (ocaml_tests @ bbc_tests)

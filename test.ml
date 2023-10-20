@@ -69,7 +69,7 @@ let make_test
       let expected =
         let i_interp = CCString.find ~sub:"|ORACLE" test.expected in
         match oracle with
-        | Interp oracle when test.status = NoError && i_interp <> -1 ->
+        | Interpreter oracle when test.status = NoError && i_interp <> -1 ->
           let prefix = CCString.sub test.expected 0 (max (i_interp - 1) 0) in
           let status , output = oracle test.src in
           status , prefix ^ output
@@ -78,8 +78,8 @@ let make_test
 
       let check_fun =
         match action with
-        | Compare -> compare_results
-        | Execute -> execute_results
+        | CompareOutput -> compare_results
+        | IgnoreOutput -> execute_results
       in
 
       let open Alcotest in
