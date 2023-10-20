@@ -17,19 +17,23 @@ Original BBCTester runs a complete pipeline for an compiler to assembler and ass
 
 Download the sources as a zip archive, unzip and install the package
 ```bash
-$ unzip BBCTester-main.zip
-Archive:  BBCTester-main.zip
-002d4d44e78e9655eff48580f1820961fd2ec520
-   creating: BBCTester-main/
-  inflating: BBCTester-main/.gitignore  
-  inflating: BBCTester-main/Makefile  
-  inflating: BBCTester-main/README.md  
-  inflating: BBCTester-main/dune     
-  inflating: BBCTester-main/dune-project  
-  inflating: BBCTester-main/test.ml  
-  inflating: BBCTester-main/test.mli
+$ unzip BBCStepTester-main.zip
+Archive:  BBCStepTester-main.zip
+0e3ce14f8587aafdcc6f64c07de0c2e3c2fde838
+   creating: BBCStepTester-main/
+  inflating: BBCStepTester-main/.gitignore  
+  inflating: BBCStepTester-main/Makefile  
+  inflating: BBCStepTester-main/README.md  
+  inflating: BBCStepTester-main/dune  
+  inflating: BBCStepTester-main/dune-project  
+  inflating: BBCStepTester-main/runtime.ml  
+  inflating: BBCStepTester-main/test.ml  
+  inflating: BBCStepTester-main/test.mli  
+  inflating: BBCStepTester-main/type.ml  
+  inflating: BBCStepTester-main/type.mli  
+  inflating: BBCStepTester-main/util.ml
 
-$ cd BBCTester-main
+$ cd BBCStepTester-main
 
 $ make install
 dune build
@@ -39,16 +43,16 @@ Installing ...
 
 Alternatively, you can clone the repository and install
 ```bash
-$ git clone https://github.com/pleiad/BBCTester.git
-Cloning into 'BBCTester'...
-remote: Enumerating objects: 19, done.
-remote: Counting objects: 100% (19/19), done.
-remote: Compressing objects: 100% (15/15), done.
-remote: Total 19 (delta 3), reused 12 (delta 3), pack-reused 0
-Receiving objects: 100% (19/19), 7.10 KiB | 7.10 MiB/s, done.
-Resolving deltas: 100% (3/3), done.
+$ git clone https://github.com/fabaindaiz/BBCStepTester
+Cloning into 'BBCStepTester'...
+remote: Enumerating objects: 81, done.
+remote: Counting objects: 100% (81/81), done.
+remote: Compressing objects: 100% (55/55), done.
+remote: Total 81 (delta 48), reused 51 (delta 25), pack-reused 0
+Receiving objects: 100% (81/81), 17.79 KiB | 17.79 MiB/s, done.
+Resolving deltas: 100% (48/48), done.
 
-$ cd BBCTester
+$ cd BBCStepTester
 
 $ make install
 dune build
@@ -65,17 +69,54 @@ Installing ...
 This package contains a few helper functions to parse test files (see below for the format) and generate unit-tests for alcotest in a single module `Test`. The main entrypoint of the library is the following function (from `test.mli`). 
 
 ```ocaml
-(* Given the path of a C runtime file [runtime], a [compiler] and
+(* Given a [name], a [compiler], a [runtime], a [oracle], a [action] and
   the path [dir] of a directory containing tests files, produces
-  unit tests for each test files in [dir].
- [compile_flags] are passed to the C compiler (clang),
- defaults to "-g".  *)
+  unit tests for each test files in [dir]. *)
 val tests_from_dir :
-  ?compile_flags:string ->
-  runtime:string ->
+  name:string ->
   compiler:compiler ->
-  ?oracle:(string -> status * string) ->
+  runtime:runtime ->
+  oracle:oracle ->
+  action:action ->
   string -> (string * unit Alcotest.test_case list) list
+```
+
+```ocaml
+(* Example of using tests_from_dir *)
+open Bbcsteptester.Type
+open Bbcsteptester.Test
+open Bbcsteptester.Runtime
+
+(* .......... *)
+
+let () =
+  let compile_flags = Option.value (Sys.getenv_opt "CFLAGS") ~default:"-g" in
+
+  let compiler : compiler = 
+    Compiler (fun s o -> fprintf o "%s" (compile_prog (parse_prog (sexp_from_string s))) ) in
+
+  let runtime : runtime =
+    Runtime (cruntime ~compile_flags "rt/sys.c") in
+  
+  let oracle : oracle = 
+    Interp (
+      fun s -> (
+        try
+          NoError, string_of_val (interp_prog (parse_prog (sexp_from_string s)) empty_env)
+        with
+        | RTError msg -> RTError, msg
+        | CTError msg -> CTError, msg
+        | e -> RTError, "Oracle raised an unknown error :"^ Printexc.to_string e 
+      )
+    )
+  in
+  
+  let bbc_tests =
+    let name : string = "bbc" in
+    let action : action = Compare in
+    tests_from_dir ~name ~compiler ~runtime ~oracle ~action "bbctests" in
+  
+  run "Tests MiniCompiler" (ocaml_tests @ bbc_tests)
 ```
 
 

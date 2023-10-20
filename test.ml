@@ -67,7 +67,7 @@ let make_test
       in
 
       let expected =
-        let i_interp = CCString.find ~sub:"|INTERP" test.expected in
+        let i_interp = CCString.find ~sub:"|ORACLE" test.expected in
         match oracle with
         | Interp oracle when test.status = NoError && i_interp <> -1 ->
           let prefix = CCString.sub test.expected 0 (max (i_interp - 1) 0) in
@@ -96,10 +96,10 @@ let name_from_file filename =
   dirname filename ^ "::" ^ basename (chop_extension filename)
 
 
-let tests_from_dir ~name ~compiler ~oracle ~runtime ~action dir =
+let tests_from_dir ~name ~compiler ~runtime ~oracle ~action dir =
   let open Alcotest in
   let to_test testfile =
-    let testname, exec_test = make_test ~compiler ~oracle ~runtime ~action testfile in
+    let testname, exec_test = make_test ~compiler ~runtime ~oracle ~action testfile in
     name_from_file (name ^ "::" ^ testfile), [test_case testname `Quick exec_test]
   in
   List.map to_test @@ testfiles_in_dir dir

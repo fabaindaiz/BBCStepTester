@@ -39,13 +39,13 @@ type t =
     (** expected result of the test *) }
 
 
-type runtime =
-| Runtime of (t -> string -> (string, status * string) result)
-
 (** A compiler is a function that takes a source program as a string, and 
-  an output channel as a sink to output the compiled program  *)
+an output channel as a sink to output the compiled program  *)
 type compiler =
 | Compiler of (string -> out_channel -> unit)
+
+type runtime =
+| Runtime of (t -> string -> (string, status * string) result)
 
 type oracle =
 | Interp of (string -> status * string)

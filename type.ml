@@ -29,11 +29,11 @@ type t =
   ; expected : string }
 
 
-type runtime =
-| Runtime of (t -> string -> (string, status * string) result)
-
 type compiler =
 | Compiler of (string -> out_channel -> unit)
+
+type runtime =
+| Runtime of (t -> string -> (string, status * string) result)
 
 type oracle =
 | Interp of (string -> status * string)
