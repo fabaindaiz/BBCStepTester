@@ -25,7 +25,9 @@ val string_of_status : status -> string
     All strings are enforced to be trimmed.
  *)
 type t =
-  { name : string
+  { file : string
+    (** Name of the test file *)
+  ; name : string
     (** Name of the test *)
   ; description : string
     (** Description of the test *)
@@ -39,18 +41,17 @@ type t =
     (** expected result of the test *) }
 
 
+val ( let* ) : ('a, 'b) result -> ('a -> ('c, 'b) result) -> ('c, 'b) result
+
+
 (** A compiler is a function that takes a source program as a string, and 
 an output channel as a sink to output the compiled program  *)
 type compiler =
-| Compiler of (string -> out_channel -> unit)
+| Compiler of (t -> string -> (string, status * string) result)
+| SCompiler of (t -> string -> string)
 
 type runtime =
 | Runtime of (t -> string -> (string, status * string) result)
 
-type oracle =
-| Interpreter of (string -> status * string)
-| Expected
-
-type action =
-| CompareOutput
-| IgnoreOutput
+type testeable =
+| Testeable of (t -> (status * string) Alcotest.testable)

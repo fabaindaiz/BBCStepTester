@@ -1,5 +1,3 @@
-
-
 type status =
   | CTError
   | RTError
@@ -7,13 +5,13 @@ type status =
 
 let status_of_string = function
   | "fail"
-  | "RT error" -> RTError
   | "CT error" -> CTError
+  | "RT error" -> RTError
   | _ -> NoError
 
 let string_of_status = function
-  | RTError -> "RT error"
   | CTError -> "CT error"
+  | RTError -> "RT error"
   | NoError -> "No error"
 
 
@@ -21,7 +19,8 @@ let string_of_status = function
 (* All strings are enforced to be trimmed. *)
 (* The expected string *)
 type t =
-  { name : string
+  { file : string
+  ; name : string
   ; description : string
   ; params : string list
   ; status : status
@@ -29,16 +28,14 @@ type t =
   ; expected : string }
 
 
+let (let*) = Result.bind
+
 type compiler =
-| Compiler of (string -> out_channel -> unit)
+| Compiler of (t -> string -> (string, status * string) result)
+| SCompiler of (t -> string -> string)
 
 type runtime =
 | Runtime of (t -> string -> (string, status * string) result)
 
-type oracle =
-| Interpreter of (string -> status * string)
-| Expected
-
-type action =
-| CompareOutput
-| IgnoreOutput
+type testeable =
+| Testeable of (t -> (status * string) Alcotest.testable)
