@@ -3,7 +3,8 @@ open Type
 
 let string_ignore =
   let open Alcotest in
-  testable (pp string) (fun _ _ -> true)
+  let matches _ _ = true in
+  testable (pp string) matches
 
 let string_match =
   let open Alcotest in
@@ -33,6 +34,7 @@ let compare_status =
       (_ : t) ->
     dep_pair status_match (fun _ -> string_ignore)
   )
+
 
 (* Testing the result of running a test *)
 let compare_results =

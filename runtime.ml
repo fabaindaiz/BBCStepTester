@@ -46,7 +46,6 @@ let clangruntime
     else Error (RTError, out ^ err)
   )
 
-
 (** Calling a unix command *)
 let unixcommand
     (command) =
@@ -64,7 +63,6 @@ let unixcommand
     else Error (RTError, out ^ err)
   )
 
-
 (** Directly passing the compiled code *)
 let compileout =
   Runtime (
@@ -76,4 +74,13 @@ let compileout =
 
     let* () = write_file file input RTError in
     Ok (process_output input)
+  )
+
+(** Not implemented runtime *)
+let notimplemented =
+  Runtime (
+      fun
+      (_ : t)
+      (_ : string) ->
+    Error (RTError, "Not implemented")
   )
