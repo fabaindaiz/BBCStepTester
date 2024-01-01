@@ -26,9 +26,13 @@ Archive:  BBCStepTester-main.zip
   inflating: BBCStepTester-main/README.md  
   inflating: BBCStepTester-main/dune  
   inflating: BBCStepTester-main/dune-project  
+  inflating: BBCStepTester-main/main.ml  
+  inflating: BBCStepTester-main/main.mli  
+  inflating: BBCStepTester-main/pipeline.ml  
   inflating: BBCStepTester-main/runtime.ml  
   inflating: BBCStepTester-main/test.ml  
   inflating: BBCStepTester-main/test.mli  
+  inflating: BBCStepTester-main/testeable.ml  
   inflating: BBCStepTester-main/type.ml  
   inflating: BBCStepTester-main/type.mli  
   inflating: BBCStepTester-main/util.ml
@@ -66,7 +70,7 @@ Installing ...
 
 ## Entrypoint
 
-This package contains a few helper functions to parse test files (see below for the format) and generate unit-tests for alcotest in a single module `Test`. The main entrypoint of the library is the following function (from `test.mli`). 
+This package contains a few helper functions to parse test files (see below for the format) and generate unit-tests for alcotest. The main entrypoint of the library is the following function (from `main.mli`).
 
 ```ocaml
 (* Given a [name], a [compiler], a [runtime], a [oracle], a [action] and
@@ -76,44 +80,41 @@ val tests_from_dir :
   name:string ->
   compiler:compiler ->
   runtime:runtime ->
-  oracle:oracle ->
-  action:action ->
+  oracle:runtime ->
+  testeable:testeable ->
   string -> (string * unit Alcotest.test_case list) list
 ```
 
 ```ocaml
 (* Example of using tests_from_dir *)
 open Bbcsteptester.Type
-open Bbcsteptester.Test
+open Bbcsteptester.Main
 open Bbcsteptester.Runtime
 
 (* .......... *)
 
+(* Entry point of tester *)
 let () =
 
   let compiler : compiler = 
-    Compiler (fun s o -> fprintf o "%s" (compile_prog (parse_prog (sexp_from_string s))) ) in
+    SCompiler ( fun _ s -> (compile_prog (parse_prog (sexp_from_string s))) ) in
 
-  let compile_flags = Option.value (Sys.getenv_opt "CFLAGS") ~default:"-g" in
-  let runtime : runtime = (cruntime ~compile_flags "rt/sys.c") in
+  let compile_flags = Option.value (Sys.getenv_opt "CFLAGS") ~default: "-z noexecstack -g -m64 -fPIE -pie" in
+  let runtime : runtime = (clangruntime ~compile_flags "rt/sys.c") in
   
-  let oracle : oracle = 
-    Interpreter (
-      fun s -> (
-        try
-          NoError, string_of_val (interp_prog (parse_prog (sexp_from_string s)) empty_env)
-        with
-        | RTError msg -> RTError, msg
-        | CTError msg -> CTError, msg
-        | e -> RTError, "Oracle raised an unknown error :"^ Printexc.to_string e 
-      )
-    )
+  let oracle : runtime = 
+    Runtime ( fun _ s -> (
+      try Ok (string_of_val (interp_prog (parse_prog (sexp_from_string s)) empty_env))
+      with
+      | RTError msg -> Error (RTError, msg)
+      | CTError msg -> Error (CTError, msg)
+      | e -> Error (RTError, "Oracle raised an unknown error :" ^ Printexc.to_string e)
+    ))
   in
   
   let bbc_tests =
     let name : string = "bbc" in
-    let action : action = CompareOutput in
-    tests_from_dir ~name ~compiler ~runtime ~oracle ~action "bbctests" in
+    tests_from_dir ~name ~compiler ~runtime ~oracle "bbctests" in
   
   run "Tests MiniCompiler" (ocaml_tests @ bbc_tests)
 ```
