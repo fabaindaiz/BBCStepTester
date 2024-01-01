@@ -4,9 +4,8 @@ type status =
   | NoError
 
 let status_of_string = function
-  | "fail"
   | "CT error" -> CTError
-  | "RT error" -> RTError
+  | "fail" | "RT error" -> RTError
   | _ -> NoError
 
 let string_of_status = function

@@ -47,7 +47,7 @@ let clangruntime
   )
 
 
-  (** Calling a unix command *)
+(** Calling a unix command *)
 let unixcommand
     (command) =
   Runtime (
@@ -65,6 +65,7 @@ let unixcommand
   )
 
 
+(** Directly passing the compiled code *)
 let compileout =
   Runtime (
       fun

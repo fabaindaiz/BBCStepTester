@@ -24,8 +24,12 @@ let dep_pair : type a b. a Alcotest.testable -> (a -> b Alcotest.testable) -> (a
 
 (* Testing the result of running a test *)
 let compare_results =
-  let result_match = function
-    | NoError -> Alcotest.string
-    | _ -> string_match
-  in
-  dep_pair status_match result_match
+  Testeable (
+      fun
+      (_ : t) ->
+    let result_match = function
+      | NoError -> Alcotest.string
+      | _ -> string_match
+    in
+    dep_pair status_match result_match
+  )

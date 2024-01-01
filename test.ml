@@ -2,7 +2,7 @@ open Type
 
 
 let test_regexp =
-  Str.regexp "NAME:\\|DESCRIPTION:\\|PARAMS:\\|STATUS:\\|SRC:\\|END"
+  Str.regexp "NAME:\\|DESCRIPTION:\\|PARAMS:\\|STATUS:\\|SRC:\\|EXPECTED:\\|END"
 
 let read_test filename =
   if Sys.file_exists filename
