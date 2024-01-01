@@ -3,9 +3,9 @@ open Type
 
 let make_test
     ~(compiler : compiler)
-    ~(runtime : runtime)
-    ~(oracle : runtime)
-    ~(testeable : testeable)
+    ?(runtime : runtime = Runtime.compileout)
+    ?(oracle : runtime = Oracle.notimplemented)
+    ?(testeable : testeable = Testeable.compare_results)
     (filename : string) =
   match Test.read_test filename with
   | None -> Alcotest.failf "Could not open or parse test %s" filename
@@ -40,10 +40,10 @@ let make_test
     dirname filename ^ "::" ^ basename (chop_extension filename)
   
   
-  let tests_from_dir ~name ~compiler ~runtime ~oracle ~testeable dir =
+  let tests_from_dir ~name ~compiler ?runtime ?oracle ?testeable dir =
     let open Alcotest in
     let to_test testfile =
-      let testname, exec_test = make_test ~compiler ~runtime ~oracle ~testeable testfile in
+      let testname, exec_test = make_test ~compiler ?runtime ?oracle ?testeable testfile in
       name_from_file (name ^ "::" ^ testfile), [test_case testname `Quick exec_test]
     in
     List.map to_test @@ testfiles_in_dir dir

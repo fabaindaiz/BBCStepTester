@@ -17,7 +17,7 @@ val testfiles_in_dir : string -> string list
 val tests_from_dir :
     name:string ->
     compiler:compiler ->
-    runtime:runtime ->
-    oracle:runtime ->
-    testeable:testeable ->
+    ?runtime:runtime ->
+    ?oracle:runtime ->
+    ?testeable:testeable ->
     string -> (string * unit Alcotest.test_case list) list

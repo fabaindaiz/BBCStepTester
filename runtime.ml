@@ -75,5 +75,5 @@ let compileout =
     let file = base ^ ".s" in
 
     let* () = write_file file input RTError in
-    Ok input
+    Ok (process_output input)
   )

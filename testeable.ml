@@ -1,6 +1,10 @@
 open Type
 
 
+let string_ignore =
+  let open Alcotest in
+  testable (pp string) (fun _ _ -> true)
+
 let string_match =
   let open Alcotest in
   let matches pat s =
@@ -21,6 +25,14 @@ let dep_pair : type a b. a Alcotest.testable -> (a -> b Alcotest.testable) -> (a
   let cmp_pair (x1, x2) (y1, y2) = equal cmp1 x1 y1 && equal (cmp2 x1) x2 y2 in
   testable (fun fmt p -> pp (pair cmp1 (cmp2 (fst p))) fmt p) cmp_pair
 
+
+(* Testing the status of running a test *)
+let compare_status =
+  Testeable (
+      fun
+      (_ : t) ->
+    dep_pair status_match (fun _ -> string_ignore)
+  )
 
 (* Testing the result of running a test *)
 let compare_results =

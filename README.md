@@ -90,7 +90,6 @@ val tests_from_dir :
 open Bbcsteptester.Type
 open Bbcsteptester.Main
 open Bbcsteptester.Runtime
-open Bbcsteptester.Testeable
 
 (* .......... *)
 
@@ -115,8 +114,7 @@ let () =
   
   let bbc_tests =
     let name : string = "bbc" in
-    let testeable = compare_results in
-    tests_from_dir ~name ~compiler ~runtime ~oracle ~testeable "bbctests" in
+    tests_from_dir ~name ~compiler ~runtime ~oracle "bbctests" in
   
   run "Tests MiniCompiler" (ocaml_tests @ bbc_tests)
 ```
