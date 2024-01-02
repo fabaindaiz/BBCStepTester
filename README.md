@@ -9,6 +9,7 @@ Original BBCTester runs a complete pipeline for an x86 assembly compiler and exe
 ## Future goals
 - Improve pipeline & test configurations
 - Add benchmarking capabilities to tests
+- Add examples with different settings
 
 ## Dependencies
 - dune (>= 3.10)
@@ -104,7 +105,7 @@ let () =
     SCompiler ( fun _ s -> (compile_prog (parse_prog (sexp_from_string s))) ) in
 
   let compile_flags = Option.value (Sys.getenv_opt "CFLAGS") ~default: "-z noexecstack -g -m64 -fPIE -pie" in
-  let runtime : runtime = (clangruntime ~compile_flags "rt/sys.c") in
+  let runtime : runtime = (clang_runtime ~compile_flags "rt/sys.c") in
   
   let oracle : runtime = 
     Runtime ( fun _ s -> (
