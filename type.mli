@@ -41,15 +41,19 @@ type t =
     (** expected result of the test *) }
 
 
+(** Bind operator for results *)
 val ( let* ) : ('a, 'b) result -> ('a -> ('c, 'b) result) -> ('c, 'b) result
 
 
-(** A compiler is a function that takes a source program as a string, and 
-an output channel as a sink to output the compiled program  *)
+(** A compiler is a function that takes a source program as a string,
+and return a string containing the result of the compilation. *)
 type compiler =
 | Compiler of (t -> string -> (string, status * string) result)
+| OCompiler of (t -> string -> out_channel -> unit)
 | SCompiler of (t -> string -> string)
 
+(** A runtime is a function that takes a source program as a string,
+and return a string containing the result of the execution. *)
 type runtime =
 | Runtime of (t -> string -> (string, status * string) result)
 

@@ -27,11 +27,13 @@ type t =
   ; expected : string }
 
 
+(** Bind operator for results *)
 let (let*) = Result.bind
 
 
 type compiler =
 | Compiler of (t -> string -> (string, status * string) result)
+| OCompiler of (t -> string -> out_channel -> unit)
 | SCompiler of (t -> string -> string)
 
 type runtime =

@@ -1,6 +1,13 @@
+open Type
+
+
+let handle_exception error func =
+  try Ok (func ())
+  with e -> Error (error, Printexc.to_string e)
+
 let handle_result result =
   match result with
-  | Ok out -> Type.NoError, out
+  | Ok out -> NoError, out
   | Error err -> err
 
 
@@ -17,10 +24,14 @@ let process_output out =
   String.trim out |> filter_lines is_comment_line
 
 
-let write_file file string error =
+let process_out_channel error file channel =
+  try Ok (CCIO.with_out file channel)
+  with e -> Error (error, Printexc.to_string e)
+
+let write_file error file string =
   try Ok (CCIO.with_out file (fun o -> output_string o string))
   with e -> Error (error, Printexc.to_string e)
 
-let read_file file error =
+let read_file error file =
   try Ok (process_output (CCIO.with_in file CCIO.read_all))
   with e -> Error (error, Printexc.to_string e)

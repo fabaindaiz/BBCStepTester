@@ -3,8 +3,8 @@ open Type
 
 let make_test
     ~(compiler : compiler)
-    ?(runtime : runtime = Runtime.compileout)
-    ?(oracle : runtime = Runtime.notimplemented)
+    ?(runtime : runtime = Runtime.compile_output)
+    ?(oracle : runtime = Runtime.not_implemented)
     ?(testeable : testeable = Testeable.compare_results)
     (filename : string) =
   match Test.read_test filename with
