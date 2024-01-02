@@ -15,7 +15,7 @@ let make_test
       let res =
         Util.handle_result @@
         let* out = Pipeline.compile compiler test in
-        let* out = Pipeline.runtime runtime test out in
+        let* out = runtime test out in
         Ok out
       in
 
@@ -25,7 +25,7 @@ let make_test
         Ok out
       in
 
-      let testing = Pipeline.test testeable test in
+      let testing = testeable test in
       Alcotest.check testing test.name exp res
 
     in test.name, exec

@@ -29,56 +29,48 @@ let clang ~compile_flags runtime basefile =
 let clang_runtime
     ?(compile_flags: string ="-g")
     (runtime : string) =
-  Runtime (
-      fun
-      (test : t)
-      (input : string) ->
-    let base = Filename.chop_extension test.file in
-    let file = base ^ ".s" in
-    let exe = base ^ ".run" in
-    
-    let* () = write_file RTError file input in
-    let* () = nasm base in
-    let* () = clang ~compile_flags runtime base in
-    let out, err, retcode = CCUnix.call ~env:(Array.of_list test.params) "./%s" exe in
-    if retcode = 0 then
-      Ok (process_output out)
-    else Error (RTError, out ^ err)
-  )
+    fun
+    (test : t)
+    (input : string) ->
+  let base = Filename.chop_extension test.file in
+  let file = base ^ ".s" in
+  let exe = base ^ ".run" in
+  
+  let* () = write_file RTError file input in
+  let* () = nasm base in
+  let* () = clang ~compile_flags runtime base in
+  let out, err, retcode = CCUnix.call ~env:(Array.of_list test.params) "./%s" exe in
+  if retcode = 0 then
+    Ok (process_output out)
+  else Error (RTError, out ^ err)
 
 (** Calling a unix command *)
 let unix_command
     (command) =
-  Runtime (
-      fun
-      (test : t)
-      (input : string) ->
-    let file = Filename.chop_extension test.file ^ ".s" in
+    fun
+    (test : t)
+    (input : string) ->
+  let file = Filename.chop_extension test.file ^ ".s" in
 
-    let* () = write_file RTError file input in
-    let out, err, retcode = CCUnix.call ~env:(Array.of_list test.params) command file in
-    if retcode = 0 then
-      Ok (process_output out)
-    else Error (RTError, out ^ err)
-  )
+  let* () = write_file RTError file input in
+  let out, err, retcode = CCUnix.call ~env:(Array.of_list test.params) command file in
+  if retcode = 0 then
+    Ok (process_output out)
+  else Error (RTError, out ^ err)
 
 (** Directly passing the compiled code *)
 let compile_output =
-  Runtime (
-      fun
-      (test : t)
-      (input : string) ->
-    let file = Filename.chop_extension test.file ^ ".s" in
-    
-    let* () = write_file RTError file input in
-    Ok (process_output input)
-  )
+    fun
+    (test : t)
+    (input : string) ->
+  let file = Filename.chop_extension test.file ^ ".s" in
+  
+  let* () = write_file RTError file input in
+  Ok (process_output input)
 
 (** Not implemented runtime *)
 let not_implemented =
-  Runtime (
-      fun
-      (_ : t)
-      (_ : string) ->
-    Error (RTError, "Not implemented")
-  )
+    fun
+    (_ : t)
+    (_ : string) ->
+  Error (RTError, "Not implemented")

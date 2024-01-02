@@ -54,8 +54,6 @@ type compiler =
 
 (** A runtime is a function that takes a source program as a string,
 and return a string containing the result of the execution. *)
-type runtime =
-| Runtime of (t -> string -> (string, status * string) result)
+type runtime = (t -> string -> (string, status * string) result)
 
-type testeable =
-| Testeable of (t -> (status * string) Alcotest.testable)
+type testeable = (t -> (status * string) Alcotest.testable)
