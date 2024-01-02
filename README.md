@@ -4,10 +4,15 @@ Black-Box Compiler Tester
 A simple library for black-box testing of compilers from the [Compiler Design and Implementation course at UChile](https://users.dcc.uchile.cl/~etanter/CC5116/).
 
 ## Fork goals
-Original BBCTester runs a complete pipeline for an compiler to assembler and assembler execution. This fork will add the possibility to configure or modify the steps that will be executed in the pipeline to be able to use BBCTester in compiler tests for other languages.
+Original BBCTester runs a complete pipeline for an x86 assembly compiler and execution with a c runtime. This fork adds the possibility to configure or modify the steps that will be executed in the pipeline to be able to use BBCTester in other test pipelines for ocaml compilers.
+
+## Future goals
+- Improve pipeline & test configurations
+- Add benchmarking capabilities to tests
+- Add examples with different settings
 
 ## Dependencies
-- dune (>= 2.9)
+- dune (>= 3.10)
 - ocaml (>= 4.08.0)
 - alcotest (>= 1.2.2)
 - containers (>= 3.0.1)
@@ -79,9 +84,9 @@ This package contains a few helper functions to parse test files (see below for 
 val tests_from_dir :
   name:string ->
   compiler:compiler ->
-  runtime:runtime ->
-  oracle:runtime ->
-  testeable:testeable ->
+  ?runtime:runtime ->
+  ?oracle:runtime ->
+  ?testeable:testeable ->
   string -> (string * unit Alcotest.test_case list) list
 ```
 
@@ -100,7 +105,7 @@ let () =
     SCompiler ( fun _ s -> (compile_prog (parse_prog (sexp_from_string s))) ) in
 
   let compile_flags = Option.value (Sys.getenv_opt "CFLAGS") ~default: "-z noexecstack -g -m64 -fPIE -pie" in
-  let runtime : runtime = (clangruntime ~compile_flags "rt/sys.c") in
+  let runtime : runtime = (clang_runtime ~compile_flags "rt/sys.c") in
   
   let oracle : runtime = 
     Runtime ( fun _ s -> (
