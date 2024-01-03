@@ -5,7 +5,7 @@ type status =
 
 let status_of_string = function
   | "CT error" -> CTError
-  | "fail" | "RT error" -> RTError
+  | "RT error" -> RTError
   | _ -> NoError
 
 let string_of_status = function
@@ -36,8 +36,6 @@ type compiler =
 | OCompiler of (t -> string -> out_channel -> unit)
 | SCompiler of (t -> string -> string)
 
-type runtime =
-| Runtime of (t -> string -> (string, status * string) result)
+type runtime = (t -> string -> (string, status * string) result)
 
-type testeable =
-| Testeable of (t -> (status * string) Alcotest.testable)
+type testeable = (t -> (status * string) Alcotest.testable)
