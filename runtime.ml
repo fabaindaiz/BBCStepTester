@@ -2,12 +2,6 @@ open Type
 open Util
 
 
-(* Produce a result out of the return data from the compiler/assembler *)
-let wrap_result (out, err, retcode) =
-  if retcode = 0 && String.equal "" err
-  then (print_string out ; Ok ())
-  else Error (CTError, out ^ err)
-
 (* Find out current architecture (only supporting Linux/OS X for now) *)
 let bin_format =
   let out, _ , _ = CCUnix.call "uname -s" in
@@ -19,10 +13,17 @@ let bin_format =
 
 
 let nasm basefile =
-  wrap_result @@ CCUnix.call "nasm -f %s -o %s.o %s.s" bin_format basefile basefile
+  print_output @@ (wrap_result RTError) @@
+  CCUnix.call "nasm -f %s -o %s.o %s.s" bin_format basefile basefile
 
 let clang ~compile_flags runtime basefile =
-  wrap_result @@ CCUnix.call "clang %s -o %s.run %s %s.o" compile_flags basefile runtime basefile
+  print_output @@ (wrap_result RTError) @@
+  CCUnix.call "clang %s -o %s.run %s %s.o" compile_flags basefile runtime basefile
+
+let call command params file =
+  let warning = true in
+  process_output @@ (wrap_result ~warning RTError) @@
+  CCUnix.call ~env:(Array.of_list params) command file
 
 
 (** Calling the compiler (clang) and assembler (nasm) *)
@@ -39,10 +40,8 @@ let clang_runtime
   let* () = write_file RTError file input in
   let* () = nasm base in
   let* () = clang ~compile_flags runtime base in
-  let out, err, retcode = CCUnix.call ~env:(Array.of_list test.params) "./%s" exe in
-  if retcode = 0 then
-    Ok (process_output out)
-  else Error (RTError, out ^ err)
+  let* out = call "./%s" test.params exe in
+  Ok out
 
 (** Calling a unix command *)
 let unix_command
@@ -50,23 +49,23 @@ let unix_command
     fun
     (test : t)
     (input : string) ->
-  let file = Filename.chop_extension test.file ^ ".s" in
+  let base = Filename.chop_extension test.file in
+  let file = base ^ ".s" in
 
   let* () = write_file RTError file input in
-  let out, err, retcode = CCUnix.call ~env:(Array.of_list test.params) command file in
-  if retcode = 0 then
-    Ok (process_output out)
-  else Error (RTError, out ^ err)
+  let* out = call command test.params file in
+  Ok out
 
 (** Directly passing the compiled code *)
-let compile_output =
+let direct_output =
     fun
     (test : t)
     (input : string) ->
-  let file = Filename.chop_extension test.file ^ ".s" in
+  let base = Filename.chop_extension test.file in
+  let file = base ^ ".s" in
   
   let* () = write_file RTError file input in
-  Ok (process_output input)
+  Ok (process_string input)
 
 (** Not implemented runtime *)
 let not_implemented =
