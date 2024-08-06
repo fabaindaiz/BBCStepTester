@@ -3,7 +3,7 @@ open Type
 
 let make_test
     ~(compiler : compiler)
-    ?(runtime : runtime = Runtime.not_implemented)
+    ?(runtime : runtime = Runtime.direct_output)
     ?(oracle : runtime = Runtime.not_implemented)
     ?(testeable : testeable = Testeable.compare_results)
     (filename : string) =

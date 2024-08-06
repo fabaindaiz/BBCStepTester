@@ -21,7 +21,6 @@ type t =
   { file : string
   ; name : string
   ; description : string
-  ; flags : string list
   ; params : string list
   ; status : status
   ; src : string
