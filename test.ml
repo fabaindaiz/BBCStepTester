@@ -2,7 +2,7 @@ open Type
 
 
 let test_regexp =
-  Str.regexp "NAME:\\|DESCRIPTION:\\|PARAMS:\\|STATUS:\\|SRC:\\|EXPECTED:\\|END"
+  Str.regexp "NAME:\\|DESCRIPTION:\\|FLAGS:\\|PARAMS:\\|STATUS:\\|SRC:\\|EXPECTED:\\|END"
 
 let get_opt s dflt tokens =
   let open Str in
@@ -16,13 +16,15 @@ let parse_content filename content =
   let toks = full_split test_regexp content in
   let name, toks = get_opt "NAME:" Filename.(chop_extension @@ basename filename) toks in
   let description, toks = get_opt "DESCRIPTION:" "" toks in
+  let flags_string, toks = get_opt "FLAGS:" "" toks in
+  let flags = List.map String.trim (String.split_on_char ',' flags_string) in
   let params_string, toks = get_opt "PARAMS:" "" toks in
   let params = List.map String.trim (String.split_on_char ',' params_string) in
   let status, toks = get_opt "STATUS:" "ok" toks in
   match toks with
   | Delim "SRC:" :: Text src ::
     Delim "EXPECTED:" :: Text expected :: ( [] | Delim "END" :: _ ) ->
-    Some { file = filename; name; description; params; status = status_of_string status;
+    Some { file = filename; name; description; flags; params; status = status_of_string status;
            src; expected = String.trim expected }
   | _ -> (Printf.fprintf stderr "Wrong format in test file %s" filename ; None)
 

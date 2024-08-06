@@ -31,6 +31,8 @@ type t =
     (** Name of the test *)
   ; description : string
     (** Description of the test *)
+  ; flags : string list
+    (** Compilation flags passed to the compiler *)
   ; params : string list
     (** Parameters passed to the test as environment variables *)
   ; status : status
