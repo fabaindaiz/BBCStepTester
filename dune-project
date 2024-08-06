@@ -1,7 +1,7 @@
 (lang dune 3.10)
 
 
-(name bbcsteptester)
+(name bbctester)
 
 ; Not using opam because of not understood bug with generated `dune subst --root`
 ; (generate_opam_files true)
@@ -10,7 +10,7 @@
 (maintainers "kenji@maillard.blue")
 
 (package
-  (name bbcsteptester)
+  (name bbctester)
   (version 0.2)
   (synopsis "Black-box compiler tester")
   (description "Tester for the compilation lecture CC5116")

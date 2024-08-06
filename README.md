@@ -22,27 +22,27 @@ Original BBCTester runs a complete pipeline for an x86 assembly compiler and exe
 
 Download the sources as a zip archive, unzip and install the package
 ```bash
-$ unzip BBCStepTester-main.zip
-Archive:  BBCStepTester-main.zip
+$ unzip BBCTester-main.zip
+Archive:  BBCTester-main.zip
 0e3ce14f8587aafdcc6f64c07de0c2e3c2fde838
-   creating: BBCStepTester-main/
-  inflating: BBCStepTester-main/.gitignore  
-  inflating: BBCStepTester-main/Makefile  
-  inflating: BBCStepTester-main/README.md  
-  inflating: BBCStepTester-main/dune  
-  inflating: BBCStepTester-main/dune-project  
-  inflating: BBCStepTester-main/main.ml  
-  inflating: BBCStepTester-main/main.mli  
-  inflating: BBCStepTester-main/pipeline.ml  
-  inflating: BBCStepTester-main/runtime.ml  
-  inflating: BBCStepTester-main/test.ml  
-  inflating: BBCStepTester-main/test.mli  
-  inflating: BBCStepTester-main/testeable.ml  
-  inflating: BBCStepTester-main/type.ml  
-  inflating: BBCStepTester-main/type.mli  
-  inflating: BBCStepTester-main/util.ml
+   creating: BBCTester-main/
+  inflating: BBCTester-main/.gitignore  
+  inflating: BBCTester-main/Makefile  
+  inflating: BBCTester-main/README.md  
+  inflating: BBCTester-main/dune  
+  inflating: BBCTester-main/dune-project  
+  inflating: BBCTester-main/main.ml  
+  inflating: BBCTester-main/main.mli  
+  inflating: BBCTester-main/pipeline.ml  
+  inflating: BBCTester-main/runtime.ml  
+  inflating: BBCTester-main/test.ml  
+  inflating: BBCTester-main/test.mli  
+  inflating: BBCTester-main/testeable.ml  
+  inflating: BBCTester-main/type.ml  
+  inflating: BBCTester-main/type.mli  
+  inflating: BBCTester-main/util.ml
 
-$ cd BBCStepTester-main
+$ cd BBCTester-main
 
 $ make install
 dune build
@@ -52,8 +52,8 @@ Installing ...
 
 Alternatively, you can clone the repository and install
 ```bash
-$ git clone https://github.com/fabaindaiz/BBCStepTester
-Cloning into 'BBCStepTester'...
+$ git clone https://github.com/pleiad/BBCTester.git
+Cloning into 'BBCTester'...
 remote: Enumerating objects: 81, done.
 remote: Counting objects: 100% (81/81), done.
 remote: Compressing objects: 100% (55/55), done.
@@ -61,7 +61,7 @@ remote: Total 81 (delta 48), reused 51 (delta 25), pack-reused 0
 Receiving objects: 100% (81/81), 17.79 KiB | 17.79 MiB/s, done.
 Resolving deltas: 100% (48/48), done.
 
-$ cd BBCStepTester
+$ cd BBCTester
 
 $ make install
 dune build
@@ -92,9 +92,9 @@ val tests_from_dir :
 
 ```ocaml
 (* Example of using tests_from_dir *)
-open Bbcsteptester.Type
-open Bbcsteptester.Main
-open Bbcsteptester.Runtime
+open Bbctester.Type
+open Bbctester.Main
+open Bbctester.Runtime
 
 (* .......... *)
 
@@ -121,7 +121,7 @@ let () =
     let name : string = "bbc" in
     tests_from_dir ~name ~compiler ~runtime ~oracle "bbctests" in
   
-  run "Tests MiniCompiler" (ocaml_tests @ bbc_tests)
+  run "Tests CC5116 Compiler" (ocaml_tests @ bbc_tests)
 ```
 
 
