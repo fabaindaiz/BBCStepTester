@@ -11,7 +11,7 @@
 
 (package
   (name bbctester)
-  (version 0.2)
+  (version 0.3)
   (synopsis "Black-box compiler tester")
   (description "Tester for the compilation lecture CC5116")
   (depends
