@@ -7,7 +7,7 @@ let make_test
     ?(oracle : runtime = Runtime.not_implemented)
     ?(testeable : testeable = Testeable.compare_results)
     (filename : string) =
-  match Test.read_test filename with
+  match File.read_test filename with
   | None -> Alcotest.failf "Could not open or parse test %s" filename
   | Some test ->
     let exec () =

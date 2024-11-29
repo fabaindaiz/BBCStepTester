@@ -1,37 +1,33 @@
-open Type
+include Type
 
 
-let test_regexp =
-  Str.regexp "NAME:\\|DESCRIPTION:\\|PARAMS:\\|STATUS:\\|SRC:\\|EXPECTED:\\|END"
-
-let get_opt s dflt tokens =
-  let open Str in
-  match tokens with
-  | Delim s' :: Text content :: rest when s = s' ->
-    String.trim content, rest
-  | all -> dflt, all
-
-let parse_content filename content =
-  let open Str in
-  let toks = full_split test_regexp content in
-  let name, toks = get_opt "NAME:" Filename.(chop_extension @@ basename filename) toks in
-  let description, toks = get_opt "DESCRIPTION:" "" toks in
-  let params_string, toks = get_opt "PARAMS:" "" toks in
-  let params = List.map String.trim (String.split_on_char ',' params_string) in
-  let status, toks = get_opt "STATUS:" "ok" toks in
-  match toks with
-  | Delim "SRC:" :: Text src ::
-    Delim "EXPECTED:" :: Text expected :: ( [] | Delim "END" :: _ ) ->
-    Some { file = filename; name; description; params; status = status_of_string status;
-           src; expected = String.trim expected }
-  | _ -> (Printf.fprintf stderr "Wrong format in test file %s" filename ; None)
+let testfiles_in_dir dir =
+  CCUnix.with_process_in ("find " ^ dir ^ " -name '*.bbc'") ~f: CCIO.read_lines_l
 
 
-let read_test filename =
-  if Sys.file_exists filename
-  then
-    CCIO.(with_in filename read_all)
-    |> String.trim
-    |> parse_content filename
-  else
-    (Printf.fprintf stderr "Test file %s not found." filename ; None)
+let oracle_from_legacy (oracle : (string -> status * string) option) : runtime option =
+  match oracle with
+  | Some runtime ->
+    Some (fun _ s ->
+    (match runtime s with
+    | NoError, value -> Ok (value)
+    | error, value -> Error (error, value)))
+  | None -> None
+
+let tests_from_dir ?(compile_flags="-g") ~runtime ~compiler ?oracle dir =
+  let name = "legacy" in
+  let compiler = OCompiler (fun _ -> compiler) in
+  let runtime = Runtime.clang_runtime ~compile_flags runtime in
+  let oracle = oracle_from_legacy oracle in
+
+  let open Alcotest in
+  let to_test testfile =
+    let testname, exec_test = Main.make_test ~compiler ~runtime ?oracle testfile in
+    Main.name_from_file name testfile, [test_case testname `Quick exec_test]
+  in
+  testfiles_in_dir dir
+  |> List.map to_test
+  |> List.sort (fun (s1,_) (s2,_) -> String.compare s1 s2)
+
+(* Use as follow: *)
+(* run "Tests" @@ List.map tests_from_dir [ "failing"; "tests"] *)

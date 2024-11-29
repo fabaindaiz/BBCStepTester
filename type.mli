@@ -1,5 +1,4 @@
 
-
 (** Expected status of a test *)
 type status =
   | CTError

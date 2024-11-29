@@ -1,5 +1,13 @@
 open Type
 
+val make_test :
+  compiler:compiler ->
+  ?runtime:runtime ->
+  ?oracle:runtime ->
+  ?testeable:testeable ->
+  string -> string * (unit -> unit)
+
+val name_from_file : string -> string -> string
 
 (** [testfiles_in_dir path] collects the content of all thet `*.bbc` files
     found at [path]; uses `find` (GNU findutils) *)

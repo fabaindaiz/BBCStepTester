@@ -20,6 +20,10 @@ let clang ~compile_flags runtime basefile =
   print_output @@ (wrap_result RTError) @@
   CCUnix.call "clang %s -o %s.run %s %s.o" compile_flags basefile runtime basefile
 
+let gcc ~compile_flags runtime basefile =
+  print_output @@ (wrap_result RTError) @@
+  CCUnix.call "gcc %s -o %s.run %s %s.o" compile_flags basefile runtime basefile
+
 let call command params file =
   let warning = true in
   process_output @@ (wrap_result ~warning RTError) @@
@@ -42,6 +46,23 @@ let clang_runtime
   let* () = clang ~compile_flags runtime base in
   let* out = call "./%s" test.params exe in
   Ok out
+
+(** Calling the compiler (gcc) and assembler (nasm) *)
+let gcc_runtime
+?(compile_flags: string ="-g")
+(runtime : string) =
+fun
+(test : t)
+(input : string) ->
+let base = Filename.chop_extension test.file in
+let file = base ^ ".s" in
+let exe = base ^ ".run" in
+
+let* () = write_file RTError file input in
+let* () = nasm base in
+let* () = gcc ~compile_flags runtime base in
+let* out = call "./%s" test.params exe in
+Ok out
 
 (** Calling a unix command *)
 let unix_command
