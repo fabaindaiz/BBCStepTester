@@ -7,7 +7,7 @@ val make_test :
   ?testeable:testeable ->
   string -> string * (unit -> unit)
 
-val name_from_file : string -> string -> string
+val name_from_file : string option -> string -> string
 
 (** [testfiles_in_dir path] collects the content of all thet `*.bbc` files
     found at [path]; uses `find` (GNU findutils) *)
@@ -23,7 +23,7 @@ val testfiles_in_dir : string -> string list
     It should return a result status together with the expected output of the corresponding program,
     that will be substituted in the first mention of `|ORACLE` in a test file, if any. *)
 val tests_from_dir :
-    name:string ->
+    name:string option ->
     compiler:compiler ->
     ?runtime:runtime ->
     ?oracle:runtime ->

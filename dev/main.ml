@@ -36,7 +36,8 @@ let testfiles_in_dir dir =
 
 let name_from_file testname filename =
   let open Filename in
-  testname ^ "::" ^ dirname filename ^ "::" ^ basename (chop_extension filename)
+  (match testname with Some t -> t ^ "::" | None -> "") ^
+  dirname filename ^ "::" ^ basename (chop_extension filename)
   
   
 let tests_from_dir ~name ~compiler ?runtime ?oracle ?testeable dir =

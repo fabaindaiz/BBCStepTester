@@ -49,17 +49,17 @@ let read_file error file =
   with e -> Error (error, Printexc.to_string e)
 
 
+(* Capture stdout from a function *)
 let has_pending_data fd =
   try
     let ready_fds, _, _ = Unix.select [fd] [] [] 0.0 in
     List.length ready_fds > 0
   with _ -> false
 
-let capture_stdout_until_done (f : unit -> 'a) : string * 'a =
+let capture_stdout (f : unit -> 'a) : string * 'a =
   let stdout_original = Unix.dup Unix.stdout in
   let (pipe_read, pipe_write) = Unix.pipe () in
-  
-  (* pipe no bloqueante para lecturas seguras *)
+
   Unix.set_nonblock pipe_read;
   Unix.dup2 pipe_write Unix.stdout;
   Unix.close pipe_write;

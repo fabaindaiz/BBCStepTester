@@ -15,7 +15,7 @@ let oracle_from_legacy (oracle : (string -> status * string) option) : runtime o
   | None -> None
 
 let tests_from_dir ?(compile_flags="-g") ~runtime ~compiler ?oracle dir =
-  let name = "legacy" in
+  let name = None in
   let compiler = OCompiler (fun _ -> compiler) in
   let runtime = Runtime.clang_runtime ~compile_flags runtime in
   let oracle = oracle_from_legacy oracle in

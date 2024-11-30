@@ -75,7 +75,7 @@ let oracle runtime test =
     try
       (* Usamos la nueva función que lee hasta completar *)
       let (stdout_output, runtime_result) = 
-        capture_stdout_until_done (fun () -> runtime test test.src) in
+        capture_stdout (fun () -> runtime test test.src) in
       let* out = runtime_result in
       Ok (prefix ^ stdout_output ^ out)
     with e -> 
