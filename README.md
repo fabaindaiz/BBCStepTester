@@ -3,22 +3,14 @@ Black-Box Compiler Tester
 
 A simple library for black-box testing of compilers from the [Compiler Design and Implementation course at UChile](https://users.dcc.uchile.cl/~etanter/CC5116/).
 
-## Fork goals
-Original BBCTester runs a complete pipeline for an x86 assembly compiler and execution with a c runtime. This fork adds the possibility to configure or modify the steps that will be executed in the pipeline to be able to use BBCTester in other test pipelines for ocaml compilers.
-
-## Future goals
-- Improve pipeline & test configurations
-- Add benchmarking capabilities to tests
-- Add examples with different settings
-
 ## Dependencies
 - dune (>= 3.10)
 - ocaml (>= 4.08.0)
 - alcotest (>= 1.2.2)
 - containers (>= 3.0.1)
 
-## Installation
 
+## Installation
 
 Download the sources as a zip archive, unzip and install the package
 ```bash
