@@ -36,7 +36,7 @@ let testfiles_in_dir dir =
 
 let name_from_file testname filename =
   let open Filename in
-  (match testname with Some t -> t ^ "::" | None -> "") ^
+  (if testname = "" then "" else testname ^ "::") ^
   dirname filename ^ "::" ^ basename (chop_extension filename)
   
   

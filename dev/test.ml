@@ -15,7 +15,6 @@ let oracle_from_legacy (oracle : (string -> status * string) option) : runtime o
   | None -> None
 
 let tests_from_dir ?(compile_flags="-g") ~runtime ~compiler ?oracle dir =
-  let name = None in
   let compiler = OCompiler (fun _ -> compiler) in
   let runtime = Runtime.clang_runtime ~compile_flags runtime in
   let oracle = oracle_from_legacy oracle in
@@ -23,7 +22,7 @@ let tests_from_dir ?(compile_flags="-g") ~runtime ~compiler ?oracle dir =
   let open Alcotest in
   let to_test testfile =
     let testname, exec_test = Main.make_test ~compiler ~runtime ?oracle testfile in
-    Main.name_from_file name testfile, [test_case testname `Quick exec_test]
+    Main.name_from_file "" testfile, [test_case testname `Quick exec_test]
   in
   testfiles_in_dir dir
   |> List.map to_test
