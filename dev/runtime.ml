@@ -78,14 +78,18 @@ let unix_command
   Ok out
 
 (** Directly passing the compiled code *)
-let direct_output =
+let direct_output
+    ?(save_file: bool =false) =
     fun
     (test : t)
     (input : string) ->
   let base = Filename.chop_extension test.file in
   let file = base ^ ".s" in
   
-  let* () = write_file RTError file input in
+  let* () =
+    if save_file then
+      write_file RTError file input
+    else Ok () in
   Ok (process_string input)
 
 (** Not implemented runtime *)

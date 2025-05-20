@@ -35,11 +35,9 @@ let testfiles_in_dir dir =
   CCUnix.with_process_in ("find " ^ dir ^ " -name '*.bbc'") ~f: CCIO.read_lines_l
 
 let name_from_file testname filename =
-  let open Filename in
-  (if testname = "" then "" else testname ^ "::") ^
-  dirname filename ^ "::" ^ basename (chop_extension filename)
+  (if testname = "" then "" else testname ^ "::") ^ filename
   
-  
+
 let tests_from_dir ~name ~compiler ?runtime ?oracle ?testeable dir =
   let open Alcotest in
   let to_test testfile =
